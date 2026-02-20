@@ -25,6 +25,16 @@ export class OrgchartNodeElement extends LitElement {
 
   private _onClick(e: Event): void {
     e.stopPropagation();
+    // If collapsible, clicking the card toggles expand/collapse
+    if (this.collapsible) {
+      this.dispatchEvent(
+        new CustomEvent('node-toggle', {
+          detail: { node: this.node },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
     this.dispatchEvent(
       new CustomEvent('node-click', {
         detail: { node: this.node },

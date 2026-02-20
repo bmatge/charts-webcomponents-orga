@@ -376,6 +376,295 @@ export class GouvOrgchart extends LitElement {
     });
   }
 
+  /**
+   * Exporte l'organigramme sous forme de document HTML autonome
+   * avec tous les styles intégrés. Utile pour l'impression ou l'export PDF.
+   */
+  exportHTML(): string {
+    if (!this._tree) return '';
+
+    const fieldMapping = this._getFieldMapping();
+    const css = this._getExportCSS();
+    const treeHtml = this._renderNodeToHTML(this._tree, fieldMapping);
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${this._escapeHtml(this.title || 'Organigramme')}</title>
+<style>
+${css}
+</style>
+</head>
+<body>
+${this.title ? `<h2 class="orgchart__title">${this._escapeHtml(this.title)}</h2>` : ''}
+<div class="orgchart__viewport" role="tree" aria-label="${this._escapeHtml(this.title || 'Organigramme')}">
+  <ul class="orgchart__level">
+    ${treeHtml}
+  </ul>
+</div>
+</body>
+</html>`;
+  }
+
+  private _escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  private _renderNodeToHTML(node: OrgNode, fm: FieldMapping): string {
+    const name = (node.data[fm.name] as string) || '';
+    const firstname = (node.data[fm.firstname] as string) || '';
+    const role = (node.data[fm.role] as string) || '';
+    const direction = (node.data[fm.direction] as string) || '';
+    const roleType = (node.data[fm.roleType] as string) || 'standard';
+    const image = (node.data[fm.image] as string) || '';
+    const badge = (node.data[fm.badge] as string) || '';
+    const badgeType = (node.data[fm.badgeType] as string) || 'info';
+    const link = (node.data[fm.link] as string) || '';
+    const vacant = node.data[fm.vacant] as boolean;
+    const interim = (node.data[fm.interim] as string) || '';
+    const email = (node.data[fm.email] as string) || '';
+    const phone = (node.data[fm.phone] as string) || '';
+
+    const isVacant = vacant || roleType === 'vacant';
+    const displayName = [firstname, name ? name.toUpperCase() : ''].filter(Boolean).join(' ') || (isVacant ? '(Vacant)' : '');
+
+    const nodeModifier = isVacant ? ' orgchart__node--vacant' : roleType === 'assistant' ? ' orgchart__node--assistant' : roleType === 'transversal' ? ' orgchart__node--transversal' : '';
+    const isDetailed = this.nodeStyle === 'detailed';
+    const isCompact = this.nodeStyle === 'compact';
+
+    // Image section
+    let imgHtml = '';
+    if (!isCompact) {
+      if (image) {
+        imgHtml = `<div class="orgchart__node-img"><img src="${this._escapeHtml(image)}" alt="${this._escapeHtml(displayName)}" /></div>`;
+      } else {
+        imgHtml = `<div class="orgchart__node-img"><span class="orgchart__node-img-placeholder">${isVacant ? '&#9675;' : '&#9679;'}</span></div>`;
+      }
+    }
+
+    // Name (with optional link)
+    const nameHtml = link
+      ? `<a href="${this._escapeHtml(link)}" class="orgchart__node-link" target="_blank" rel="noopener"><p class="orgchart__node-name">${this._escapeHtml(displayName)}</p></a>`
+      : `<p class="orgchart__node-name">${this._escapeHtml(displayName)}</p>`;
+
+    // Badge
+    const badgeHtml = badge && !isCompact
+      ? `<div class="orgchart__node-badges"><span class="orgchart__badge orgchart__badge--${this._escapeHtml(badgeType)}">${this._escapeHtml(badge)}</span></div>`
+      : '';
+
+    // Contact
+    let contactHtml = '';
+    if (isDetailed && (email || phone)) {
+      contactHtml = `<div class="orgchart__node-contact">`;
+      if (email) contactHtml += `<a href="mailto:${this._escapeHtml(email)}"><span class="orgchart__node-contact-icon">&#9993;</span> ${this._escapeHtml(email)}</a>`;
+      if (phone) contactHtml += `<a href="tel:${this._escapeHtml(phone)}"><span class="orgchart__node-contact-icon">&#9742;</span> ${this._escapeHtml(phone)}</a>`;
+      contactHtml += `</div>`;
+    }
+
+    const nodeHtml = `<div class="orgchart__node${nodeModifier}">
+      ${imgHtml}
+      <div class="orgchart__node-content">
+        ${nameHtml}
+        ${role ? `<p class="orgchart__node-role">${this._escapeHtml(role)}</p>` : ''}
+        ${isVacant ? '<p class="orgchart__node-vacant">Poste vacant</p>' : ''}
+        ${interim ? `<p class="orgchart__node-interim">Int&eacute;rim : ${this._escapeHtml(interim)}</p>` : ''}
+        ${badgeHtml}
+        ${direction && !isCompact ? `<p class="orgchart__node-direction">${this._escapeHtml(direction)}</p>` : ''}
+        ${contactHtml}
+      </div>
+    </div>`;
+
+    // Assistants
+    const assistantsHtml = node.assistants.map((a) => {
+      const aHtml = this._renderNodeToHTML(a, fm);
+      return `<div class="orgchart__aside orgchart__aside--left"><li class="orgchart__branch orgchart__branch--assistant">${aHtml}</li></div>`;
+    }).join('');
+
+    // Transversals
+    const transversalsHtml = node.transversals.map((t) => {
+      const tHtml = this._renderNodeToHTML(t, fm);
+      return `<div class="orgchart__aside orgchart__aside--right"><li class="orgchart__branch orgchart__branch--transversal">${tHtml}</li></div>`;
+    }).join('');
+
+    // Children
+    let childrenHtml = '';
+    if (node.children.length > 0) {
+      const childItems = node.children.map((c) => this._renderNodeToHTML(c, fm)).join('');
+      childrenHtml = `<ul class="orgchart__level" role="group">${childItems}</ul>`;
+    }
+
+    return `<li class="orgchart__branch" role="treeitem">
+      <div class="orgchart__node-group">
+        ${assistantsHtml}
+        ${nodeHtml}
+        ${transversalsHtml}
+      </div>
+      ${childrenHtml}
+    </li>`;
+  }
+
+  private _getExportCSS(): string {
+    return `
+      @page { size: landscape; margin: 1cm; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Marianne', arial, sans-serif;
+        color: #161616;
+        background: #fff;
+        padding: 1rem;
+      }
+      .orgchart__title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #161616;
+        margin: 0 0 1rem 0;
+      }
+      .orgchart__viewport { padding: 1em; overflow: visible; }
+      .orgchart__level {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        margin: 0; padding: 0;
+        position: relative;
+      }
+      .orgchart__branch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        padding: 1.5em 0.75em 0;
+      }
+      /* Vertical connector from parent */
+      .orgchart__branch::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%;
+        width: 0; height: 1.5em;
+        border-left: 2px solid #ddd;
+      }
+      .orgchart__level:first-child > .orgchart__branch::before { display: none; }
+      /* Horizontal connector between siblings */
+      .orgchart__level > .orgchart__branch::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 0;
+        border-top: 2px solid #ddd;
+      }
+      .orgchart__level > .orgchart__branch:first-child::after { left: 50%; width: 50%; }
+      .orgchart__level > .orgchart__branch:last-child::after { width: 50%; }
+      .orgchart__level > .orgchart__branch:only-child::after { display: none; }
+      /* Connector from node to children */
+      .orgchart__branch > .orgchart__level {
+        padding-top: 2em;
+        position: relative;
+      }
+      .orgchart__branch > .orgchart__level::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%;
+        width: 0; height: 2em;
+        border-left: 2px solid #ddd;
+      }
+      /* Assistant / transversal dashed connectors */
+      .orgchart__branch--assistant::before,
+      .orgchart__branch--transversal::before {
+        border-left-style: dashed;
+      }
+      /* Node group */
+      .orgchart__node-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 1em;
+        position: relative;
+      }
+      .orgchart__aside { position: relative; }
+      .orgchart__aside--left { order: -1; }
+      .orgchart__aside--right { order: 1; }
+      .orgchart__aside::before {
+        content: '';
+        position: absolute;
+        top: 50%; width: 1em; height: 0;
+        border-top: 2px dashed #ddd;
+      }
+      .orgchart__aside--left::before { right: -1em; }
+      .orgchart__aside--right::before { left: -1em; }
+      /* Node card */
+      .orgchart__node {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+        padding: 0.75rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        width: ${this.nodeStyle === 'compact' ? '180px' : this.nodeStyle === 'detailed' ? '260px' : '220px'};
+        min-width: 0;
+      }
+      .orgchart__node--vacant { opacity: 0.5; border-style: dashed; }
+      .orgchart__node--assistant { border-left: 3px solid #000091; }
+      .orgchart__node--transversal { background: #f8f9fa; border-left: 3px solid #6a6af4; }
+      .orgchart__node-img {
+        width: 48px; height: 48px; border-radius: 50%;
+        overflow: hidden; flex-shrink: 0; background: #eee;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .orgchart__node-img img { width: 100%; height: 100%; object-fit: cover; }
+      .orgchart__node-img-placeholder { font-size: 1.25rem; color: #999; }
+      .orgchart__node-content { flex: 1; min-width: 0; }
+      .orgchart__node-name {
+        font-size: 0.875rem; font-weight: 700; color: #161616;
+        margin: 0; line-height: 1.3;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .orgchart__node-role {
+        font-size: 0.75rem; color: #666;
+        margin: 0.125rem 0 0; line-height: 1.3;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .orgchart__node-direction {
+        font-size: 0.6875rem; color: #666;
+        margin: 0.25rem 0 0; font-style: italic;
+      }
+      .orgchart__node-badges { display: flex; gap: 0.25rem; margin-top: 0.375rem; }
+      .orgchart__badge {
+        display: inline-block; font-size: 0.625rem; font-weight: 700;
+        text-transform: uppercase; padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem; line-height: 1.4; white-space: nowrap;
+      }
+      .orgchart__badge--info { background: #e8edff; color: #000091; }
+      .orgchart__badge--success { background: #b8fec9; color: #18753c; }
+      .orgchart__badge--error { background: #ffe9e6; color: #ce0500; }
+      .orgchart__badge--warning { background: #ffe9c5; color: #b34000; }
+      .orgchart__badge--new { background: #000091; color: #fff; }
+      .orgchart__badge--green-emeraude { background: #c3fad5; color: #297254; }
+      .orgchart__badge--purple-glycine { background: #fee7fc; color: #6e445a; }
+      .orgchart__badge--pink-macaron { background: #fee9e7; color: #8d533e; }
+      .orgchart__badge--blue-ecume { background: #e9edfe; color: #2f4077; }
+      .orgchart__badge--green-bourgeon { background: #c9fcac; color: #447049; }
+      .orgchart__badge--yellow-tournesol { background: #feecc2; color: #716043; }
+      .orgchart__badge--orange-terre-battue { background: #fee9e5; color: #755348; }
+      .orgchart__badge--brown-cafe-creme { background: #f7ece4; color: #685c48; }
+      .orgchart__badge--beige-gris-galet { background: #f3ede5; color: #6a6156; }
+      .orgchart__node-vacant { font-size: 0.75rem; color: #ce0500; font-style: italic; margin-top: 0.25rem; }
+      .orgchart__node-interim { font-size: 0.6875rem; color: #666; margin-top: 0.125rem; }
+      .orgchart__node-link { color: inherit; text-decoration: none; }
+      .orgchart__node-contact {
+        margin-top: 0.5rem; padding-top: 0.5rem;
+        border-top: 1px solid #ddd; font-size: 0.6875rem; color: #666;
+        display: flex; flex-direction: column; gap: 0.25rem;
+      }
+      .orgchart__node-contact a { color: #000091; text-decoration: none; display: flex; align-items: center; gap: 0.375rem; }
+      .orgchart__node-contact-icon { flex-shrink: 0; font-size: 0.75rem; }
+    `;
+  }
+
   // === Event handlers ===
 
   private _onNodeClick(node: OrgNode): void {
