@@ -1,0 +1,37 @@
+{
+  "name": "gouv-orgchart",
+  "version": "0.1.0",
+  "description": "Web Component pour afficher un organigramme hiérarchique conforme DSFR",
+  "type": "module",
+  "main": "dist/gouv-orgchart.js",
+  "module": "dist/gouv-orgchart.js",
+  "types": "dist/gouv-orgchart.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "orgchart",
+    "web-component",
+    "lit",
+    "dsfr",
+    "gouv"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "lit": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "vitest": "^1.6.0",
+    "jsdom": "^24.1.0"
+  }
+}

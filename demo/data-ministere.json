@@ -1,0 +1,217 @@
+[
+  {
+    "id": 1,
+    "parent_id": null,
+    "nom": "Martin",
+    "prenom": "Sophie",
+    "fonction": "Directrice générale",
+    "direction": "Direction générale",
+    "role_type": "standard",
+    "image": "",
+    "badge": "DG",
+    "badge_type": "info",
+    "email": "sophie.martin@ministere.gouv.fr",
+    "telephone": "01 23 45 67 89"
+  },
+  {
+    "id": 2,
+    "parent_id": 1,
+    "nom": "Durand",
+    "prenom": "Pierre",
+    "fonction": "Secrétaire général adjoint",
+    "role_type": "assistant",
+    "badge": "SGA",
+    "badge_type": "purple-glycine",
+    "email": "pierre.durand@ministere.gouv.fr"
+  },
+  {
+    "id": 3,
+    "parent_id": 1,
+    "nom": "Bernard",
+    "prenom": "Marie",
+    "fonction": "Directrice des ressources humaines",
+    "direction": "DRH",
+    "role_type": "standard",
+    "badge": "Directrice",
+    "badge_type": "green-emeraude",
+    "email": "marie.bernard@ministere.gouv.fr",
+    "telephone": "01 23 45 67 90"
+  },
+  {
+    "id": 4,
+    "parent_id": 1,
+    "nom": "Lefevre",
+    "prenom": "Jean",
+    "fonction": "Conseiller numérique",
+    "role_type": "transversal",
+    "badge": "Mission",
+    "badge_type": "warning",
+    "email": "jean.lefevre@ministere.gouv.fr"
+  },
+  {
+    "id": 5,
+    "parent_id": 1,
+    "nom": "Moreau",
+    "prenom": "Claire",
+    "fonction": "Directrice financière",
+    "direction": "DAF",
+    "role_type": "standard",
+    "badge": "Directrice",
+    "badge_type": "green-emeraude",
+    "email": "claire.moreau@ministere.gouv.fr"
+  },
+  {
+    "id": 6,
+    "parent_id": 1,
+    "nom": "Roux",
+    "prenom": "Nicolas",
+    "fonction": "Directeur des systèmes d'information",
+    "direction": "DSI",
+    "role_type": "standard",
+    "badge": "Directeur",
+    "badge_type": "blue-ecume",
+    "email": "nicolas.roux@ministere.gouv.fr"
+  },
+  {
+    "id": 7,
+    "parent_id": 3,
+    "nom": "",
+    "fonction": "Chef de bureau recrutement",
+    "direction": "DRH",
+    "vacant": true,
+    "badge": "Vacant",
+    "badge_type": "error"
+  },
+  {
+    "id": 8,
+    "parent_id": 3,
+    "nom": "Lambert",
+    "prenom": "Isabelle",
+    "fonction": "Cheffe de bureau formation",
+    "direction": "DRH",
+    "role_type": "standard",
+    "email": "isabelle.lambert@ministere.gouv.fr"
+  },
+  {
+    "id": 9,
+    "parent_id": 3,
+    "nom": "Garcia",
+    "prenom": "Antonio",
+    "fonction": "Chef de bureau paie",
+    "direction": "DRH",
+    "role_type": "standard",
+    "email": "antonio.garcia@ministere.gouv.fr"
+  },
+  {
+    "id": 10,
+    "parent_id": 5,
+    "nom": "Faure",
+    "prenom": "Élise",
+    "fonction": "Cheffe de bureau budget",
+    "direction": "DAF",
+    "role_type": "standard"
+  },
+  {
+    "id": 11,
+    "parent_id": 5,
+    "nom": "Simon",
+    "prenom": "Marc",
+    "fonction": "Chef de bureau comptabilité",
+    "direction": "DAF",
+    "role_type": "standard"
+  },
+  {
+    "id": 12,
+    "parent_id": 6,
+    "nom": "Thomas",
+    "prenom": "Julien",
+    "fonction": "Chef de bureau infrastructure",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 13,
+    "parent_id": 6,
+    "nom": "Robert",
+    "prenom": "Amélie",
+    "fonction": "Cheffe de bureau développement",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 14,
+    "parent_id": 6,
+    "nom": "Blanc",
+    "prenom": "Frédéric",
+    "fonction": "Architecte technique",
+    "direction": "DSI",
+    "role_type": "transversal",
+    "badge": "Transverse",
+    "badge_type": "warning"
+  },
+  {
+    "id": 15,
+    "parent_id": 12,
+    "nom": "Meyer",
+    "prenom": "Hans",
+    "fonction": "Administrateur systèmes",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 16,
+    "parent_id": 12,
+    "nom": "Duval",
+    "prenom": "Cécile",
+    "fonction": "Administratrice réseaux",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 17,
+    "parent_id": 13,
+    "nom": "Lefebvre",
+    "prenom": "Lucas",
+    "fonction": "Développeur senior",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 18,
+    "parent_id": 13,
+    "nom": "Girard",
+    "prenom": "Emma",
+    "fonction": "Développeuse full-stack",
+    "direction": "DSI",
+    "role_type": "standard"
+  },
+  {
+    "id": 19,
+    "parent_id": 1,
+    "nom": "Perrin",
+    "prenom": "Aurélie",
+    "fonction": "Directrice de la communication",
+    "direction": "DIRCOM",
+    "role_type": "standard",
+    "badge": "Directrice",
+    "badge_type": "pink-macaron"
+  },
+  {
+    "id": 20,
+    "parent_id": 19,
+    "nom": "Morel",
+    "prenom": "Thomas",
+    "fonction": "Chef de bureau presse",
+    "direction": "DIRCOM",
+    "role_type": "standard"
+  },
+  {
+    "id": 21,
+    "parent_id": 19,
+    "nom": "Fournier",
+    "prenom": "Camille",
+    "fonction": "Cheffe de bureau digital",
+    "direction": "DIRCOM",
+    "role_type": "standard"
+  }
+]

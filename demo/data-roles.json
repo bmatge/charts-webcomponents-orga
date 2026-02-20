@@ -1,0 +1,96 @@
+[
+  {
+    "id": 1,
+    "parent_id": null,
+    "nom": "Dupont",
+    "prenom": "Jean",
+    "fonction": "Directeur",
+    "direction": "Direction",
+    "role_type": "standard",
+    "badge": "Directeur",
+    "badge_type": "info"
+  },
+  {
+    "id": 2,
+    "parent_id": 1,
+    "nom": "Martin",
+    "prenom": "Sophie",
+    "fonction": "Adjointe au directeur",
+    "role_type": "assistant",
+    "badge": "Adjointe",
+    "badge_type": "purple-glycine"
+  },
+  {
+    "id": 3,
+    "parent_id": 1,
+    "nom": "Leroy",
+    "prenom": "Paul",
+    "fonction": "Chargé de mission numérique",
+    "role_type": "transversal",
+    "badge": "Mission",
+    "badge_type": "warning"
+  },
+  {
+    "id": 4,
+    "parent_id": 1,
+    "nom": "Bernard",
+    "prenom": "Marie",
+    "fonction": "Sous-directrice A",
+    "direction": "Sous-direction A",
+    "role_type": "standard",
+    "badge": "SD-A",
+    "badge_type": "green-emeraude"
+  },
+  {
+    "id": 5,
+    "parent_id": 1,
+    "nom": "Petit",
+    "prenom": "Luc",
+    "fonction": "Sous-directeur B",
+    "direction": "Sous-direction B",
+    "role_type": "standard",
+    "badge": "SD-B",
+    "badge_type": "blue-ecume"
+  },
+  {
+    "id": 6,
+    "parent_id": 4,
+    "nom": "",
+    "fonction": "Chef de bureau A1",
+    "direction": "Sous-direction A",
+    "role_type": "vacant",
+    "vacant": true,
+    "badge": "Vacant",
+    "badge_type": "error"
+  },
+  {
+    "id": 7,
+    "parent_id": 4,
+    "nom": "Garcia",
+    "prenom": "Elena",
+    "fonction": "Cheffe de bureau A2",
+    "direction": "Sous-direction A",
+    "role_type": "standard"
+  },
+  {
+    "id": 8,
+    "parent_id": 5,
+    "nom": "Roux",
+    "prenom": "Nicolas",
+    "fonction": "Chef de bureau B1",
+    "direction": "Sous-direction B",
+    "role_type": "standard",
+    "interim": "FAURE Élise",
+    "badge": "Intérim",
+    "badge_type": "warning"
+  },
+  {
+    "id": 9,
+    "parent_id": 5,
+    "nom": "Thomas",
+    "prenom": "Julie",
+    "fonction": "Cheffe de bureau B2",
+    "direction": "Sous-direction B",
+    "role_type": "standard"
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "parent_id": null,
+    "nom": "Dupont",
+    "prenom": "Jean",
+    "fonction": "Directeur général",
+    "direction": "Direction générale",
+    "role_type": "standard",
+    "badge": "DG",
+    "badge_type": "info"
+  },
+  {
+    "id": 2,
+    "parent_id": 1,
+    "nom": "Martin",
+    "prenom": "Sophie",
+    "fonction": "Directrice adjointe",
+    "direction": "Direction générale",
+    "role_type": "standard",
+    "badge": "DGA",
+    "badge_type": "purple-glycine"
+  },
+  {
+    "id": 3,
+    "parent_id": 1,
+    "nom": "Bernard",
+    "prenom": "Pierre",
+    "fonction": "Directeur technique",
+    "direction": "DSI",
+    "role_type": "standard",
+    "badge": "DSI",
+    "badge_type": "green-emeraude"
+  },
+  {
+    "id": 4,
+    "parent_id": 2,
+    "nom": "Petit",
+    "prenom": "Marie",
+    "fonction": "Cheffe de bureau RH",
+    "direction": "DRH",
+    "role_type": "standard"
+  },
+  {
+    "id": 5,
+    "parent_id": 3,
+    "nom": "Leroy",
+    "prenom": "Paul",
+    "fonction": "Chef de projet",
+    "direction": "DSI",
+    "role_type": "standard"
+  }
+]
