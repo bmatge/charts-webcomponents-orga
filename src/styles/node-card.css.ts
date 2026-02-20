@@ -3,6 +3,7 @@ import { css } from 'lit';
 export const nodeCardStyles = css`
   :host {
     display: block;
+    position: relative;
     width: var(--orgchart-node-width, 220px);
   }
 
