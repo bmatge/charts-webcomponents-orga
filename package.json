@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:pages": "vite build --mode pages",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
