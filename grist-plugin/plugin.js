@@ -9,7 +9,110 @@ import '../src/gouv-orgchart.ts';
 const orgchart = document.getElementById('orgchart');
 const loading = document.getElementById('loading');
 
-// Column mapping for Grist
+// === Settings panel ===
+
+const settingsToggle = document.getElementById('settings-toggle');
+const settingsPanel = document.getElementById('settings-panel');
+
+const optTitre = document.getElementById('opt-titre');
+const optNodeStyle = document.getElementById('opt-node-style');
+const optOrientation = document.getElementById('opt-orientation');
+const optExpandLevel = document.getElementById('opt-expand-level');
+const optSearchable = document.getElementById('opt-searchable');
+const optCompact = document.getElementById('opt-compact');
+
+// Toggle panel open/close
+settingsToggle.addEventListener('click', () => {
+  settingsPanel.classList.toggle('open');
+});
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+  if (
+    settingsPanel.classList.contains('open') &&
+    !settingsPanel.contains(e.target) &&
+    e.target !== settingsToggle
+  ) {
+    settingsPanel.classList.remove('open');
+  }
+});
+
+// Apply an option to the orgchart and persist it via Grist
+function setOption(key, value) {
+  // Apply to component
+  switch (key) {
+    case 'titre':
+      if (value) orgchart.setAttribute('title', value);
+      else orgchart.removeAttribute('title');
+      break;
+    case 'nodeStyle':
+      orgchart.setAttribute('node-style', value || 'card');
+      break;
+    case 'orientation':
+      orgchart.setAttribute('orientation', value || 'top-to-bottom');
+      break;
+    case 'expandLevel':
+      orgchart.setAttribute('expand-level', String(value ?? 2));
+      if (orgchart.expandToLevel) orgchart.expandToLevel(Number(value ?? 2));
+      break;
+    case 'searchable':
+      if (value === 'false' || value === false) orgchart.removeAttribute('searchable');
+      else orgchart.setAttribute('searchable', '');
+      break;
+    case 'compact':
+      if (value === 'true' || value === true) orgchart.setAttribute('compact', '');
+      else orgchart.removeAttribute('compact');
+      break;
+  }
+
+  // Persist via Grist
+  try {
+    grist.setOption(key, value);
+  } catch {
+    // grist.setOption may not be available in all contexts
+  }
+}
+
+// Bind settings controls
+optTitre.addEventListener('change', () => setOption('titre', optTitre.value));
+optNodeStyle.addEventListener('change', () => setOption('nodeStyle', optNodeStyle.value));
+optOrientation.addEventListener('change', () => setOption('orientation', optOrientation.value));
+optExpandLevel.addEventListener('change', () => setOption('expandLevel', Number(optExpandLevel.value)));
+optSearchable.addEventListener('change', () => setOption('searchable', optSearchable.value));
+optCompact.addEventListener('change', () => setOption('compact', optCompact.value));
+
+// Populate settings panel from saved options
+function applyOptionsToUI(options) {
+  if (!options) return;
+
+  if (options.titre != null) {
+    optTitre.value = options.titre;
+    setOption('titre', options.titre);
+  }
+  if (options.nodeStyle) {
+    optNodeStyle.value = options.nodeStyle;
+    setOption('nodeStyle', options.nodeStyle);
+  }
+  if (options.orientation) {
+    optOrientation.value = options.orientation;
+    setOption('orientation', options.orientation);
+  }
+  if (options.expandLevel != null) {
+    optExpandLevel.value = options.expandLevel;
+    setOption('expandLevel', options.expandLevel);
+  }
+  if (options.searchable != null) {
+    optSearchable.value = String(options.searchable);
+    setOption('searchable', options.searchable);
+  }
+  if (options.compact != null) {
+    optCompact.value = String(options.compact);
+    setOption('compact', options.compact);
+  }
+}
+
+// === Column mapping ===
+
 const columnsMappingOptions = [
   { name: 'id',        title: 'Identifiant unique',                               optional: false, type: 'Int',         allowMultiple: false },
   { name: 'parentId',  title: 'Identifiant du N+1',                               optional: false, type: 'Any',         allowMultiple: false },
@@ -51,27 +154,6 @@ const gristFieldToOrgchartField = {
 
 let currentMappings = {};
 
-// Apply saved options
-async function applyOptions() {
-  try {
-    const titre = await grist.getOption('titre');
-    if (titre) orgchart.setAttribute('title', titre);
-
-    const nodeStyle = await grist.getOption('nodeStyle');
-    if (nodeStyle) orgchart.setAttribute('node-style', nodeStyle);
-
-    const orientation = await grist.getOption('orientation');
-    if (orientation) orgchart.setAttribute('orientation', orientation);
-
-    const expandLevel = await grist.getOption('expandLevel');
-    if (expandLevel !== undefined && expandLevel !== null) {
-      orgchart.setAttribute('expand-level', String(expandLevel));
-    }
-  } catch {
-    // Options not set yet — use defaults
-  }
-}
-
 // Transform Grist records to flat array with our field names
 function transformRecords(gristRecords, mappings) {
   if (!gristRecords || !Array.isArray(gristRecords)) return [];
@@ -91,7 +173,6 @@ function transformRecords(gristRecords, mappings) {
 
         // Handle Grist null-like values
         if (value === '' || value === null || value === undefined) {
-          // For parent_id, keep null explicitly
           if (orgField === 'parent_id') {
             value = null;
           } else {
@@ -129,7 +210,8 @@ function onRecords(gristRecords, mappings) {
   orgchart.style.display = 'block';
 }
 
-// Initialize Grist widget
+// === Initialize Grist widget ===
+
 grist.ready({
   columns: columnsMappingOptions,
   requiredAccess: 'read table',
@@ -138,17 +220,7 @@ grist.ready({
 
 grist.onRecords(onRecords);
 
-// Listen for options changes
+// Listen for options changes (e.g. from another tab or session)
 grist.onOptions((options) => {
-  if (!options) return;
-
-  if (options.titre) orgchart.setAttribute('title', options.titre);
-  if (options.nodeStyle) orgchart.setAttribute('node-style', options.nodeStyle);
-  if (options.orientation) orgchart.setAttribute('orientation', options.orientation);
-  if (options.expandLevel !== undefined) {
-    orgchart.setAttribute('expand-level', String(options.expandLevel));
-  }
+  applyOptionsToUI(options);
 });
-
-// Apply saved options on load
-applyOptions();
