@@ -3,9 +3,8 @@
  * Lit les données de la table sélectionnée et les affiche dans le composant.
  */
 
-// Import the built component (will be served from dist/ or bundled)
-// In production (GitHub Pages), the built file is copied alongside plugin.js.
-import '../dist/gouv-orgchart.js';
+// Import the component source — Vite handles bundling for both dev and production.
+import '../src/gouv-orgchart.ts';
 
 const orgchart = document.getElementById('orgchart');
 const loading = document.getElementById('loading');
